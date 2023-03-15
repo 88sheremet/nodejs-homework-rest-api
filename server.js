@@ -1,6 +1,11 @@
 
 const mongoose = require('mongoose');
 
+
+
+const mongoose = require('mongoose');
+
+
 const app = require('./app');
 
 const { DB_HOST, PORT = 3000 } = process.env;
@@ -13,6 +18,9 @@ mongoose
   .catch(error => {
     console.log(error.message);
     process.exit(1);
+
+  });
+
   });
 const app = require('./app');
 require('dotenv').config();
@@ -23,4 +31,5 @@ app.listen(PORT, err => {
   if (err) console.error('Error at aserver launch:', err);
   console.log(`Server works at port: ${PORT}!`);
 });
+
 
