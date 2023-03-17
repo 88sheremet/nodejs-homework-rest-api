@@ -5,12 +5,14 @@ const path = require('path');
 const Jimp = require('jimp');
 const gravatar = require('gravatar');
 
+
 const service = require('../service/users');
 const User = require('../service/schemas/users');
 const { RequestError } = require('../helpers');
 const { registerValidator, loginValidator } = require('../utils/validator');
 
 const { SECRET_KEY } = process.env;
+
 
 const avatarsDir = path.join(__dirname, '../', 'public', 'avatars');
 
@@ -35,6 +37,18 @@ const register = async (req, res) => {
     subscription,
     avatarURL,
   });
+
+const register = async (req, res) => {
+  const { error } = registerValidator(req.body);
+  if (error) return res.status(400).json({ message: error.details[0].message });
+  const { name, email, password, subscription } = req.body;
+  const user = await service.getUser({ email });
+  if (user) {
+    throw RequestError(409, 'Email in use');
+  }
+  const hashPassword = await bcrypt.hash(password, 10);
+  const result = await User.create({ name, email, password: hashPassword, subscription });
+
   res.status(201).json({
     name: result.name,
     email: result.email,
@@ -44,6 +58,10 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { error } = loginValidator(req.body);
   if (error) return res.status(400).json({ message: error.details[0].message });
+
+
+  const { email, password } = req.body;
+
 
   const { email, password } = req.body;
 
@@ -57,11 +75,19 @@ const login = async (req, res) => {
     throw RequestError(401, 'Email or password wrong');
   }
 
+
   const payload = {
     id: user._id,
   };
 
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' });
+
+
+  const payload = {
+    id: user._id,
+  };
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' });
+  console.log(token);
 
   await User.findByIdAndUpdate(user._id, { token });
   res.json({
@@ -97,6 +123,7 @@ const logout = async (req, res) => {
   });
 };
 
+
 const updateAvatar = async (req, res) => {
   const { _id } = req.user;
   const { path: tempUpload, originalname } = req.file;
@@ -118,3 +145,6 @@ const updateAvatar = async (req, res) => {
 };
 
 module.exports = { register, login, logout, getCurrent, updateAvatar };
+
+module.exports = { register, login, logout, getCurrent };
+
