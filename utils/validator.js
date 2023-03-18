@@ -4,6 +4,11 @@ const joi = require('joi');
 const emailRegexp = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
 
 
+
+const emailRegexp = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
+
+
+
 const contactSchema = joi.object({
   name: joi.string().min(3),
   email: joi.string().email(),
@@ -56,7 +61,11 @@ module.exports = {
   loginValidator,
   contactUpdateValidatar,
   updateFavoriteValidator,
+
+};
+
 };
 
 module.exports = { contactValidator };
+
 
